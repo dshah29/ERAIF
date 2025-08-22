@@ -1,0 +1,64 @@
+# Core web framework
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.5.0
+python-multipart>=0.0.6
+aiofiles>=23.2.1
+
+# Medical imaging standards
+pydicom>=2.4.3
+pynetdicom>=2.0.2
+
+# HL7 FHIR support
+fhir.resources>=7.0.2
+requests>=2.31.0
+
+# Database and storage
+sqlalchemy>=2.0.23
+alembic>=1.13.0
+asyncpg>=0.29.0  # PostgreSQL async driver
+redis>=5.0.1
+aioredis>=2.0.1
+
+# Security and authentication
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+cryptography>=41.0.7
+
+# Configuration and environment
+pyyaml>=6.0.1
+python-dotenv>=1.0.0
+
+# Monitoring and observability
+prometheus-client>=0.19.0
+structlog>=23.2.0
+opentelemetry-api>=1.21.0
+opentelemetry-sdk>=1.21.0
+opentelemetry-instrumentation-fastapi>=0.42b0
+
+# HTTP client
+httpx>=0.25.2
+aiohttp>=3.9.1
+
+# Data processing
+pandas>=2.1.4
+numpy>=1.24.4
+
+# Async utilities
+asyncio-mqtt>=0.16.1
+
+# Testing dependencies (for development)
+pytest>=7.4.3
+pytest-asyncio>=0.21.1
+pytest-cov>=4.1.0
+pytest-mock>=3.12.0
+
+# Code quality (for development)
+black>=23.11.0
+flake8>=6.1.0
+mypy>=1.7.1
+isort>=5.12.0
+
+# Documentation (for development)
+mkdocs>=1.5.3
+mkdocs-material>=9.4.8

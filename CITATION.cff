@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "ERAIF - Emergency Radiology AI Interoperability Framework"
+abstract: "A vendor-neutral framework for medical imaging system interoperability during emergency situations"
+authors:
+  - family-names: "Shah"
+    given-names: "Darshan"
+    email: "darshan@eraif.org"
+    orcid: "https://orcid.org/0009-0000-6475-300X"
+repository-code: "https://github.com/dshah29/ERAIF"
+url: "https://eraif.org"
+version: "1.0.0"
+date-released: "2024-01-15"
+license: MIT
+keywords:
+  - "emergency medicine"
+  - "radiology"
+  - "interoperability"
+  - "DICOM"
+  - "HL7 FHIR"
+  - "artificial intelligence"
+  - "disaster response"
+  - "healthcare IT"
