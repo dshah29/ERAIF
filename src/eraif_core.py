@@ -1,338 +1,360 @@
+#!/usr/bin/env python3
 """
-ERAIF Core Module
-
-This module contains the core functionality of the Emergency Radiology AI
-Interoperability Framework, including emergency mode management, system
-monitoring, and protocol handling.
+ERAIF Core Implementation
+Emergency Radiology AI Interoperability Framework
+Version: 0.1.0
+License: MIT
 """
 
-import asyncio
+import json
+import hashlib
 import logging
-import time
-from datetime import datetime, timedelta
 from enum import Enum
 from typing import Dict, List, Optional, Any
-from uuid import uuid4
+from datetime import datetime
+from dataclasses import dataclass, asdict
 
-from .models.emergency import EmergencyMode, EmergencyStatus
-from .models.patient import Patient
-from .models.study import Study
-from .protocols.dicom import DICOMProtocol
-from .protocols.fhir import FHIRProtocol
-from .protocols.ecp import ECPProtocol
-from .utils.monitoring import SystemMonitor
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
-class ERAIFCore:
-    """
-    Core ERAIF system that manages emergency protocols, system monitoring,
-    and interoperability between medical imaging systems.
-    """
+class EmergencyMode(Enum):
+    """Operating modes for ERAIF system."""
+    NORMAL = "normal"
+    DEGRADED = "degraded"
+    DISASTER = "disaster"
+    MASS_CASUALTY = "mass_casualty"
+    ISOLATION = "isolation"
+
+
+class Priority(Enum):
+    """Message priority levels."""
+    ROUTINE = 0
+    URGENT = 1
+    STAT = 2
+    CRITICAL = 3
+    LIFE_THREATENING = 4
+
+
+class MessageType(Enum):
+    """Types of ERAIF messages."""
+    IMAGE_REQUEST = "image_request"
+    IMAGE_RESPONSE = "image_response"
+    STATUS_CHECK = "status_check"
+    EMERGENCY_ALERT = "emergency_alert"
+    HANDSHAKE = "handshake"
+
+
+@dataclass
+class ERAIFMessage:
+    """Core ERAIF message structure."""
+    version: str = "1.0"
+    timestamp: str = ""
+    priority: Priority = Priority.ROUTINE
+    mode: EmergencyMode = EmergencyMode.NORMAL
+    message_type: MessageType = MessageType.IMAGE_REQUEST
+    payload: Dict[str, Any] = None
+    routing: Dict[str, Any] = None
+    signature: str = ""
     
-    def __init__(self, config: Dict[str, Any]):
-        """
-        Initialize the ERAIF Core system.
-        
-        Args:
-            config: Configuration dictionary
-        """
-        self.config = config
-        self.logger = logging.getLogger(__name__)
-        
-        # System state
-        self.emergency_mode = EmergencyMode.NORMAL
-        self.emergency_id: Optional[str] = None
-        self.emergency_start_time: Optional[datetime] = None
-        self.system_status = "initializing"
-        
-        # Protocol handlers
-        self.dicom_protocol = DICOMProtocol(config.get("dicom", {}))
-        self.fhir_protocol = FHIRProtocol(config.get("fhir", {}))
-        self.ecp_protocol = ECPProtocol(config.get("ecp", {}))
-        
-        # System monitoring
-        self.monitor = SystemMonitor(config.get("monitoring", {}))
-        
-        # Active connections and studies
-        self.active_connections: Dict[str, Any] = {}
-        self.active_studies: Dict[str, Study] = {}
-        self.emergency_queue: List[Study] = []
-        
-        self.logger.info("ERAIF Core initialized")
+    def __post_init__(self):
+        if not self.timestamp:
+            self.timestamp = datetime.utcnow().isoformat() + "Z"
+        if self.payload is None:
+            self.payload = {}
+        if self.routing is None:
+            self.routing = {}
+        if not self.signature:
+            self.signature = self.generate_signature()
     
-    async def initialize(self):
-        """Initialize the ERAIF system."""
-        try:
-            self.logger.info("Initializing ERAIF Core...")
-            
-            # Initialize protocol handlers
-            await self.dicom_protocol.initialize()
-            await self.fhir_protocol.initialize()
-            await self.ecp_protocol.initialize()
-            
-            # Start system monitoring
-            await self.monitor.start()
-            
-            # Setup emergency triggers
-            await self._setup_emergency_triggers()
-            
-            self.system_status = "ready"
-            self.logger.info("ERAIF Core initialization complete")
-            
-        except Exception as e:
-            self.system_status = "error"
-            self.logger.error(f"Failed to initialize ERAIF Core: {e}")
-            raise
+    def generate_signature(self) -> str:
+        """Generate message signature for verification."""
+        content = f"{self.timestamp}{self.priority.value}{self.message_type.value}"
+        return hashlib.sha256(content.encode()).hexdigest()[:16]
     
-    async def shutdown(self):
-        """Shutdown the ERAIF system gracefully."""
-        try:
-            self.logger.info("Shutting down ERAIF Core...")
-            
-            # Deactivate emergency mode if active
-            if self.emergency_mode != EmergencyMode.NORMAL:
-                await self.deactivate_emergency_mode("System shutdown")
-            
-            # Shutdown protocol handlers
-            await self.dicom_protocol.shutdown()
-            await self.fhir_protocol.shutdown()
-            await self.ecp_protocol.shutdown()
-            
-            # Stop monitoring
-            await self.monitor.stop()
-            
-            self.system_status = "stopped"
-            self.logger.info("ERAIF Core shutdown complete")
-            
-        except Exception as e:
-            self.logger.error(f"Error during shutdown: {e}")
-    
-    async def get_health_status(self) -> Dict[str, Any]:
-        """Get system health status."""
-        return {
-            "status": "healthy" if self.system_status == "ready" else self.system_status,
-            "timestamp": datetime.utcnow().isoformat(),
-            "version": "1.0.0",
-            "emergency_mode": self.emergency_mode.value,
-            "components": {
-                "dicom": await self.dicom_protocol.get_status(),
-                "fhir": await self.fhir_protocol.get_status(),
-                "ecp": await self.ecp_protocol.get_status(),
-                "monitor": await self.monitor.get_status()
-            }
+    def to_json(self) -> str:
+        """Convert message to JSON format."""
+        data = {
+            "version": self.version,
+            "timestamp": self.timestamp,
+            "priority": self.priority.name,
+            "mode": self.mode.name,
+            "message_type": self.message_type.value,
+            "payload": self.payload,
+            "routing": self.routing,
+            "signature": self.signature
         }
+        return json.dumps(data, indent=2)
     
-    async def get_emergency_status(self) -> Dict[str, Any]:
-        """Get emergency system readiness status."""
-        return {
-            "emergency_mode": self.emergency_mode != EmergencyMode.NORMAL,
-            "mode": self.emergency_mode.value,
-            "emergency_id": self.emergency_id,
-            "readiness": "ready" if self.system_status == "ready" else "not_ready",
-            "last_test": await self._get_last_test_time(),
-            "active_since": self.emergency_start_time.isoformat() if self.emergency_start_time else None,
-            "backup_systems": await self._check_backup_systems(),
-            "queue_size": len(self.emergency_queue)
-        }
+    @classmethod
+    def from_json(cls, json_str: str) -> 'ERAIFMessage':
+        """Create message from JSON string."""
+        data = json.loads(json_str)
+        return cls(
+            version=data.get("version", "1.0"),
+            timestamp=data.get("timestamp"),
+            priority=Priority[data.get("priority", "ROUTINE")],
+            mode=EmergencyMode[data.get("mode", "NORMAL")],
+            message_type=MessageType(data.get("message_type", "image_request")),
+            payload=data.get("payload", {}),
+            routing=data.get("routing", {}),
+            signature=data.get("signature", "")
+        )
+
+
+class ERAIFNode:
+    """Represents a node in the ERAIF network."""
     
-    async def activate_emergency_mode(self, reason: str, duration: Optional[str] = None) -> Dict[str, Any]:
-        """
-        Activate emergency mode.
+    def __init__(self, node_id: str, hospital_name: str):
+        self.node_id = node_id
+        self.hospital_name = hospital_name
+        self.mode = EmergencyMode.NORMAL
+        self.connected_nodes: List[str] = []
+        self.message_queue: List[ERAIFMessage] = []
+        self.cached_data: Dict[str, Any] = {}
         
-        Args:
-            reason: Reason for activation
-            duration: Estimated duration (e.g., "72h")
+        logger.info(f"ERAIF Node initialized: {self.node_id} ({self.hospital_name})")
+    
+    def set_mode(self, mode: EmergencyMode):
+        """Change operating mode."""
+        old_mode = self.mode
+        self.mode = mode
+        logger.warning(f"Mode change: {old_mode.value} -> {mode.value}")
         
-        Returns:
-            Emergency activation response
-        """
+        if mode == EmergencyMode.DISASTER:
+            self._activate_disaster_mode()
+        elif mode == EmergencyMode.MASS_CASUALTY:
+            self._activate_mass_casualty_mode()
+    
+    def _activate_disaster_mode(self):
+        """Activate disaster mode protocols."""
+        logger.critical("DISASTER MODE ACTIVATED")
+        # Implement disaster-specific logic
+        # - Enable all fallback connections
+        # - Reduce authentication requirements
+        # - Prioritize life-critical only
+    
+    def _activate_mass_casualty_mode(self):
+        """Activate mass casualty protocols."""
+        logger.critical("MASS CASUALTY MODE ACTIVATED")
+        # Implement mass casualty logic
+        # - Clear non-critical from queue
+        # - Enable rapid triage
+        # - Activate AI assist
+    
+    def send_message(self, message: ERAIFMessage, destination: str) -> bool:
+        """Send message to another node."""
         try:
-            self.logger.warning(f"Activating emergency mode: {reason}")
+            # In disaster mode, attempt multiple paths
+            if self.mode == EmergencyMode.DISASTER:
+                return self._send_disaster_mode(message, destination)
             
-            # Generate emergency ID
-            self.emergency_id = f"emg_{uuid4().hex[:8]}"
-            self.emergency_start_time = datetime.utcnow()
-            
-            # Determine emergency mode based on system conditions
-            system_health = await self.monitor.get_system_health()
-            if system_health["connectivity"] < 0.3:
-                self.emergency_mode = EmergencyMode.DISASTER
-            elif system_health["connectivity"] < 0.7:
-                self.emergency_mode = EmergencyMode.HYBRID
-            else:
-                self.emergency_mode = EmergencyMode.EMERGENCY
-            
-            # Configure protocols for emergency mode
-            await self.dicom_protocol.set_emergency_mode(self.emergency_mode)
-            await self.fhir_protocol.set_emergency_mode(self.emergency_mode)
-            await self.ecp_protocol.set_emergency_mode(self.emergency_mode)
-            
-            # Start emergency monitoring
-            await self.monitor.start_emergency_monitoring()
-            
-            # Process queued studies
-            await self._process_emergency_queue()
-            
-            estimated_end = None
-            if duration:
-                estimated_end = (self.emergency_start_time + self._parse_duration(duration)).isoformat()
-            
-            response = {
-                "emergency_id": self.emergency_id,
-                "status": "activated",
-                "mode": self.emergency_mode.value,
-                "activation_time": self.emergency_start_time.isoformat(),
-                "reason": reason,
-                "estimated_end": estimated_end
-            }
-            
-            self.logger.warning(f"Emergency mode activated: {response}")
-            return response
+            # Normal sending logic
+            logger.info(f"Sending {message.message_type.value} to {destination}")
+            # Actual network implementation would go here
+            return True
             
         except Exception as e:
-            self.logger.error(f"Failed to activate emergency mode: {e}")
-            raise
+            logger.error(f"Failed to send message: {e}")
+            self.message_queue.append(message)  # Queue for retry
+            return False
     
-    async def deactivate_emergency_mode(self, reason: str) -> Dict[str, Any]:
-        """
-        Deactivate emergency mode.
+    def _send_disaster_mode(self, message: ERAIFMessage, destination: str) -> bool:
+        """Send message using disaster mode protocols."""
+        paths = ["primary", "p2p", "satellite", "cellular"]
         
-        Args:
-            reason: Reason for deactivation
+        for path in paths:
+            logger.info(f"Attempting {path} path to {destination}")
+            # Try each communication path
+            # Actual implementation would attempt each
+            if path == "p2p":  # Simulate P2P success
+                return True
         
-        Returns:
-            Emergency deactivation response
-        """
-        try:
-            if self.emergency_mode == EmergencyMode.NORMAL:
-                return {"status": "already_normal"}
-            
-            self.logger.info(f"Deactivating emergency mode: {reason}")
-            
-            # Return protocols to normal mode
-            await self.dicom_protocol.set_emergency_mode(EmergencyMode.NORMAL)
-            await self.fhir_protocol.set_emergency_mode(EmergencyMode.NORMAL)
-            await self.ecp_protocol.set_emergency_mode(EmergencyMode.NORMAL)
-            
-            # Stop emergency monitoring
-            await self.monitor.stop_emergency_monitoring()
-            
-            # Calculate emergency duration
-            duration = None
-            if self.emergency_start_time:
-                duration = str(datetime.utcnow() - self.emergency_start_time)
-            
-            response = {
-                "emergency_id": self.emergency_id,
-                "status": "deactivated",
-                "deactivation_time": datetime.utcnow().isoformat(),
-                "duration": duration,
-                "reason": reason
-            }
-            
-            # Reset emergency state
-            self.emergency_mode = EmergencyMode.NORMAL
-            self.emergency_id = None
-            self.emergency_start_time = None
-            
-            self.logger.info(f"Emergency mode deactivated: {response}")
-            return response
-            
-        except Exception as e:
-            self.logger.error(f"Failed to deactivate emergency mode: {e}")
-            raise
+        return False
     
-    async def test_emergency_systems(self) -> Dict[str, Any]:
-        """Test emergency systems readiness."""
-        try:
-            self.logger.info("Testing emergency systems...")
-            
-            test_results = {
-                "test_id": f"test_{uuid4().hex[:8]}",
-                "timestamp": datetime.utcnow().isoformat(),
-                "overall_status": "pass",
-                "components": {}
-            }
-            
-            # Test protocol handlers
-            test_results["components"]["dicom"] = await self.dicom_protocol.test_emergency_readiness()
-            test_results["components"]["fhir"] = await self.fhir_protocol.test_emergency_readiness()
-            test_results["components"]["ecp"] = await self.ecp_protocol.test_emergency_readiness()
-            
-            # Test system monitoring
-            test_results["components"]["monitor"] = await self.monitor.test_emergency_readiness()
-            
-            # Test backup systems
-            test_results["components"]["backup"] = await self._test_backup_systems()
-            
-            # Determine overall status
-            failed_components = [
-                name for name, result in test_results["components"].items()
-                if result.get("status") != "pass"
-            ]
-            
-            if failed_components:
-                test_results["overall_status"] = "fail"
-                test_results["failed_components"] = failed_components
-            
-            self.logger.info(f"Emergency systems test completed: {test_results['overall_status']}")
-            return test_results
-            
-        except Exception as e:
-            self.logger.error(f"Emergency systems test failed: {e}")
+    def receive_message(self, message: ERAIFMessage) -> Dict[str, Any]:
+        """Process received message."""
+        logger.info(f"Received {message.message_type.value} priority={message.priority.name}")
+        
+        # Verify signature
+        if not self._verify_signature(message):
+            if self.mode != EmergencyMode.DISASTER:
+                return {"status": "error", "reason": "invalid_signature"}
+            logger.warning("Invalid signature accepted in DISASTER mode")
+        
+        # Process based on type
+        if message.message_type == MessageType.IMAGE_REQUEST:
+            return self._handle_image_request(message)
+        elif message.message_type == MessageType.EMERGENCY_ALERT:
+            return self._handle_emergency_alert(message)
+        
+        return {"status": "processed"}
+    
+    def _verify_signature(self, message: ERAIFMessage) -> bool:
+        """Verify message signature."""
+        expected = message.generate_signature()
+        return message.signature == expected
+    
+    def _handle_image_request(self, message: ERAIFMessage) -> Dict[str, Any]:
+        """Handle incoming image request."""
+        patient_id = message.payload.get("patient_id")
+        modality = message.payload.get("modality")
+        
+        logger.info(f"Image request: patient={patient_id}, modality={modality}")
+        
+        # Check cache first
+        cache_key = f"{patient_id}_{modality}"
+        if cache_key in self.cached_data:
             return {
-                "test_id": f"test_{uuid4().hex[:8]}",
-                "timestamp": datetime.utcnow().isoformat(),
-                "overall_status": "error",
-                "error": str(e)
+                "status": "success",
+                "data": self.cached_data[cache_key],
+                "source": "cache"
             }
-    
-    async def _setup_emergency_triggers(self):
-        """Setup automatic emergency triggers."""
-        # This would setup monitoring for network failures, system overload, etc.
-        # Implementation depends on specific monitoring requirements
-        pass
-    
-    async def _get_last_test_time(self) -> Optional[str]:
-        """Get timestamp of last emergency test."""
-        # This would retrieve the last test time from storage
-        return "2024-01-15T09:00:00Z"  # Placeholder
-    
-    async def _check_backup_systems(self) -> Dict[str, str]:
-        """Check status of backup systems."""
+        
+        # In real implementation, would query PACS
         return {
-            "offline_storage": "ready",
-            "satellite_link": "ready",
-            "battery_backup": "90%"
+            "status": "pending",
+            "estimated_time": 30
         }
     
-    async def _test_backup_systems(self) -> Dict[str, Any]:
-        """Test backup systems."""
+    def _handle_emergency_alert(self, message: ERAIFMessage) -> Dict[str, Any]:
+        """Handle emergency alert message."""
+        alert_type = message.payload.get("alert_type")
+        logger.critical(f"EMERGENCY ALERT: {alert_type}")
+        
+        # Automatically adjust mode based on alert
+        if alert_type == "mass_casualty":
+            self.set_mode(EmergencyMode.MASS_CASUALTY)
+        elif alert_type == "infrastructure_failure":
+            self.set_mode(EmergencyMode.DISASTER)
+        
+        return {"status": "alert_acknowledged"}
+    
+    def get_status(self) -> Dict[str, Any]:
+        """Get current node status."""
         return {
-            "status": "pass",
-            "offline_storage": "ready",
-            "satellite_link": "ready",
-            "battery_backup": "90%"
+            "node_id": self.node_id,
+            "hospital": self.hospital_name,
+            "mode": self.mode.value,
+            "connected_nodes": len(self.connected_nodes),
+            "queued_messages": len(self.message_queue),
+            "cache_size": len(self.cached_data),
+            "timestamp": datetime.utcnow().isoformat() + "Z"
         }
+
+
+class ERAIFNetwork:
+    """Manages the ERAIF network of nodes."""
     
-    async def _process_emergency_queue(self):
-        """Process studies in the emergency queue."""
-        while self.emergency_queue:
-            study = self.emergency_queue.pop(0)
-            await self._process_emergency_study(study)
+    def __init__(self):
+        self.nodes: Dict[str, ERAIFNode] = {}
+        self.emergency_status = False
+        
+    def register_node(self, node: ERAIFNode):
+        """Register a new node in the network."""
+        self.nodes[node.node_id] = node
+        logger.info(f"Node registered: {node.node_id}")
+        
+        # Notify other nodes
+        for other_id, other_node in self.nodes.items():
+            if other_id != node.node_id:
+                other_node.connected_nodes.append(node.node_id)
     
-    async def _process_emergency_study(self, study: Study):
-        """Process a single study in emergency mode."""
-        # Implementation for emergency study processing
-        pass
+    def broadcast_emergency(self, emergency_type: str):
+        """Broadcast emergency to all nodes."""
+        self.emergency_status = True
+        
+        alert = ERAIFMessage(
+            priority=Priority.CRITICAL,
+            message_type=MessageType.EMERGENCY_ALERT,
+            payload={"alert_type": emergency_type}
+        )
+        
+        for node in self.nodes.values():
+            node.receive_message(alert)
+        
+        logger.critical(f"Emergency broadcast sent: {emergency_type}")
     
-    def _parse_duration(self, duration: str) -> timedelta:
-        """Parse duration string (e.g., '72h', '30m') into timedelta."""
-        if duration.endswith('h'):
-            return timedelta(hours=int(duration[:-1]))
-        elif duration.endswith('m'):
-            return timedelta(minutes=int(duration[:-1]))
-        elif duration.endswith('d'):
-            return timedelta(days=int(duration[:-1]))
-        else:
-            return timedelta(hours=24)  # Default to 24 hours
+    def get_network_status(self) -> Dict[str, Any]:
+        """Get status of entire network."""
+        return {
+            "total_nodes": len(self.nodes),
+            "emergency_active": self.emergency_status,
+            "nodes": [node.get_status() for node in self.nodes.values()]
+        }
+
+
+# Example usage and testing
+if __name__ == "__main__":
+    # Initialize network
+    network = ERAIFNetwork()
+    
+    # Create hospital nodes
+    node1 = ERAIFNode("HOSP001", "County General Hospital")
+    node2 = ERAIFNode("HOSP002", "St. Mary's Medical Center")
+    node3 = ERAIFNode("HOSP003", "Rural Community Hospital")
+    
+    # Register nodes
+    network.register_node(node1)
+    network.register_node(node2)
+    network.register_node(node3)
+    
+    # Simulate normal operation
+    logger.info("=== NORMAL OPERATION ===")
+    
+    # Create an image request
+    request = ERAIFMessage(
+        priority=Priority.URGENT,
+        message_type=MessageType.IMAGE_REQUEST,
+        payload={
+            "patient_id": hashlib.sha256(b"12345").hexdigest(),
+            "modality": "CT",
+            "body_part": "HEAD",
+            "reason": "trauma"
+        },
+        routing={
+            "source": "HOSP001",
+            "destination": "HOSP002"
+        }
+    )
+    
+    # Send message
+    node1.send_message(request, "HOSP002")
+    
+    # Process at receiving node
+    response = node2.receive_message(request)
+    print(f"Response: {response}")
+    
+    # Simulate emergency
+    logger.info("\n=== SIMULATING MASS CASUALTY EVENT ===")
+    network.broadcast_emergency("mass_casualty")
+    
+    # Check network status
+    status = network.get_network_status()
+    print(f"\nNetwork Status: {json.dumps(status, indent=2)}")
+    
+    # Simulate disaster mode
+    logger.info("\n=== SIMULATING DISASTER MODE ===")
+    node3.set_mode(EmergencyMode.DISASTER)
+    
+    # Try sending in disaster mode
+    disaster_msg = ERAIFMessage(
+        priority=Priority.LIFE_THREATENING,
+        message_type=MessageType.IMAGE_REQUEST,
+        payload={
+            "patient_id": hashlib.sha256(b"67890").hexdigest(),
+            "modality": "XRAY",
+            "body_part": "CHEST",
+            "reason": "crushing_injury"
+        }
+    )
+    
+    node3.send_message(disaster_msg, "HOSP001")
+    
+    print("\n=== ERAIF SIMULATION COMPLETE ===")
+    print("This demonstrates core ERAIF functionality:")
+    print("- Message creation and routing")
+    print("- Emergency mode activation")
+    print("- Disaster failover protocols")
+    print("- Network-wide coordination")
