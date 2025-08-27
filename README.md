@@ -1,4 +1,4 @@
-# ERAIF - Emergency Radiology AI Interoperability Framework
+# 🚨 ERAIF - Emergency Radiology AI Interoperability Framework
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Status: Active Development](https://img.shields.io/badge/Status-Active%20Development-green)]()
@@ -11,7 +11,7 @@ During recent disasters, critical failures in radiology system interoperability 
 - **Hurricane Helene (2024):** 47 hospitals couldn't share imaging data, resulting in 12+ documented preventable deaths
 - **Texas Winter Storm (2021):** Complete diagnostic system isolation for 72 hours
 - **COVID-19 (2020-2023):** 60% of hospitals reported critical imaging sharing failures
-- **Hurricane Ian (2022):** $2.3M in redundant imaging due to system incompatibilities
+- **Hurricane Ian (2022022):** $2.3M in redundant imaging due to system incompatibilities
 
 **Every minute of delay in accessing prior imaging during emergencies costs lives.**
 
@@ -71,6 +71,25 @@ python -m pytest tests/
 python src/eraif_server.py
 ```
 
+## 🎮 Interactive Demo
+
+**Try the ERAIF system in action!**
+
+```bash
+# Launch the interactive demo
+python launch_demo.py
+
+# Or navigate to the demo directory
+cd demo/
+python run_demo.py
+```
+
+**Web Demo:**
+- Open `demo/demo.html` in your browser
+- Experience real-time emergency coordination
+- Test disaster response protocols
+- See AI analysis in action
+
 ## 📊 Impact Metrics
 
 - **Response Time:** Reduce diagnostic access from 45 min → 3 min during disasters
@@ -92,6 +111,8 @@ Currently working with:
 ### Phase 1: Foundation (Current)
 - [x] Core protocol specification
 - [x] Reference implementation
+- [x] Interactive demo system
+- [x] Sample data generation
 - [ ] FHIR integration complete
 - [ ] Security audit
 
@@ -128,7 +149,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 - [Implementation Guide](docs/IMPLEMENTATION-GUIDE.md)
 - [Security Model](docs/SECURITY.md)
 - [API Reference](docs/API.md)
-
+- **[Interactive Demo](demo/)** 🆕
 
 ## 🔐 Security
 

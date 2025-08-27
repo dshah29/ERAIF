@@ -255,6 +255,233 @@
             text-decoration: none;
             margin: 0 10px;
         }
+        
+        /* ERAIF Demo Section Styles */
+        .eraif-demo-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 80px 0;
+            margin: 60px 0;
+            border-radius: 20px;
+        }
+        
+        .demo-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .demo-header h2 {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        
+        .demo-subtitle {
+            font-size: 1.2rem;
+            color: #6c757d;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .demo-features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+        
+        .demo-feature {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 1px solid #e9ecef;
+        }
+        
+        .demo-feature:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+        
+        .demo-feature h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .demo-feature p {
+            color: #6c757d;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .feature-list li {
+            color: #495057;
+            padding: 5px 0;
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        .feature-list li:before {
+            content: "✓";
+            color: #28a745;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+        
+        .demo-cta {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 50px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 50px;
+            box-shadow: 0 10px 30px rgba(44, 62, 80, 0.3);
+        }
+        
+        .cta-content h3 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #ecf0f1;
+        }
+        
+        .cta-content p {
+            font-size: 1.1rem;
+            color: #bdc3c7;
+            margin-bottom: 30px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .demo-launch-button {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+            display: inline-block;
+        }
+        
+        .demo-launch-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .demo-info-button {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+            display: inline-block;
+        }
+        
+        .demo-info-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .demo-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 30px;
+            text-align: center;
+        }
+        
+        .stat-item {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e9ecef;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #dc3545;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Responsive Design for Demo Section */
+        @media (max-width: 768px) {
+            .eraif-demo-section {
+                padding: 60px 0;
+            }
+            
+            .demo-header h2 {
+                font-size: 2rem;
+            }
+            
+            .demo-features-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .demo-cta {
+                padding: 40px 20px;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .demo-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .demo-stats {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -350,6 +577,96 @@
                 <div class="progress-fill" id="progressFill">0%</div>
             </div>
         </div>
+
+        <!-- ERAIF Interactive Demo Section -->
+        <section class="eraif-demo-section">
+            <div class="container">
+                <div class="demo-header">
+                    <h2>🚨 Interactive ERAIF Demo</h2>
+                    <p class="demo-subtitle">Experience the Emergency Radiology AI Interoperability Framework in action!</p>
+                </div>
+                
+                <div class="demo-features-grid">
+                    <div class="demo-feature">
+                        <div class="feature-icon">🏥</div>
+                        <h3>Hospital Network Management</h3>
+                        <p>Create and manage hospital nodes in real-time. Watch as facilities connect and coordinate during emergencies.</p>
+                        <ul class="feature-list">
+                            <li>Real-time node creation</li>
+                            <li>Network status monitoring</li>
+                            <li>Connection visualization</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="demo-feature">
+                        <div class="feature-icon">📨</div>
+                        <h3>Emergency Message Handling</h3>
+                        <p>Send and receive critical messages between hospitals. Experience the ERAIF protocol in action.</p>
+                        <ul class="feature-list">
+                            <li>Priority-based messaging</li>
+                            <li>Multiple message types</li>
+                            <li>Real-time delivery tracking</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="demo-feature">
+                        <div class="feature-icon">🚨</div>
+                        <h3>Emergency Protocol Testing</h3>
+                        <p>Activate disaster modes and test emergency response protocols. See how the system adapts.</p>
+                        <ul class="feature-list">
+                            <li>Mass casualty protocols</li>
+                            <li>Disaster mode activation</li>
+                            <li>Resource failover testing</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="demo-feature">
+                        <div class="feature-icon">🤖</div>
+                        <h3>AI Analysis Integration</h3>
+                        <p>Experience how AI analysis results are integrated into emergency response workflows.</p>
+                        <ul class="feature-list">
+                            <li>AI findings display</li>
+                            <li>Confidence scoring</li>
+                            <li>Recommendation systems</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="demo-cta">
+                    <div class="cta-content">
+                        <h3>Ready to Experience ERAIF?</h3>
+                        <p>Launch the interactive demo and see how emergency radiology coordination works in real-time.</p>
+                    </div>
+                    <div class="cta-buttons">
+                        <a href="demo/demo.html" class="demo-launch-button">
+                            🚀 Launch Interactive Demo
+                        </a>
+                        <a href="demo/" class="demo-info-button">
+                            📖 Learn More
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="demo-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">25+</div>
+                        <div class="stat-label">Sample Patients</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">56+</div>
+                        <div class="stat-label">Imaging Studies</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">4</div>
+                        <div class="stat-label">Emergency Scenarios</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">803</div>
+                        <div class="stat-label">Total Images</div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
         <div class="footer">
             <p>ERAIF - Saving lives through emergency interoperability</p>

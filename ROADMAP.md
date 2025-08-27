@@ -4,7 +4,7 @@
 
 This roadmap outlines the development phases for the Emergency Radiology AI Interoperability Framework (ERAIF), from initial foundation to national deployment.
 
-## Phase 1: Foundation (Q4 2024 - Q1 2025) ✅
+## Phase 1: Foundation (Q3 2025 - Q4 2025) ✅
 
 ### Core Infrastructure
 - [x] Basic framework architecture
@@ -29,7 +29,7 @@ This roadmap outlines the development phases for the Emergency Radiology AI Inte
 
 ---
 
-## Phase 2: Validation (Q2 2025 - Q3 2025)
+## Phase 2: Validation (Q1 2026 - Q2 2026)
 
 ### Enhanced Features
 - [ ] Advanced AI integration
@@ -64,7 +64,7 @@ This roadmap outlines the development phases for the Emergency Radiology AI Inte
 
 ---
 
-## Phase 3: Standards & Certification (Q4 2025 - Q1 2026)
+## Phase 3: Standards & Certification (Q2 2026 - Q3 2026)
 
 ### Standards Compliance
 - [ ] HL7 FHIR R5 support
@@ -98,7 +98,7 @@ This roadmap outlines the development phases for the Emergency Radiology AI Inte
 
 ---
 
-## Phase 4: National Rollout (Q2 2026 - Q4 2026)
+## Phase 4: National Rollout (Q3 2026 - Q4 2026)
 
 ### National Integration
 - [ ] National Emergency Medical System integration
