@@ -92,8 +92,9 @@ python launch_demo.py
 
 # Select from multiple demo modes:
 # 1. 🤖 AI/ML Demo - Advanced AI-powered analysis
-# 2. 📊 Classic Demo - Original system features  
+# 2. 📊 Classic Demo - Original system features
 # 3. 🎮 Web Demo - Browser-based interface
+# 4. 🏥 Hospital to Clinic Transfer - Real-world protocol example
 ```
 
 **AI Demo Features:**
@@ -104,11 +105,40 @@ python launch_demo.py
 - 📊 **Resource Optimization:** ML-driven capacity planning
 - 🔄 **Real-time Monitoring:** Continuous AI analysis
 
+**Hospital to Clinic Transfer Example:**
+- Complete end-to-end workflow demonstration
+- HIPAA-compliant patient data transfer
+- DICOM imaging study transfer with AI analysis
+- Security and encryption demonstrations
+- Comprehensive audit trail and reporting
+
 **Web Demo:**
 - Open `demo/demo.html` in your browser
 - Experience real-time emergency coordination
 - Test disaster response protocols
 - See AI analysis in action
+
+## 🏥 Working Examples
+
+Check out our real-world protocol examples in [`demo/examples/`](demo/examples/):
+
+### Hospital to Clinic Transfer
+A complete demonstration of secure imaging data transfer from hospital to outpatient clinic:
+
+```bash
+cd demo/examples
+python hospital_to_clinic_transfer.py
+```
+
+**What it demonstrates:**
+- ✅ Secure handshake protocol between facilities
+- ✅ HIPAA-compliant patient demographics transfer
+- ✅ DICOM imaging study transfer with metadata
+- ✅ AI analysis results sharing
+- ✅ Data integrity verification
+- ✅ Comprehensive audit logging
+
+See [`demo/examples/README.md`](demo/examples/README.md) for more examples and documentation.
 
 ## 📊 Impact Metrics
 

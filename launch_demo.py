@@ -45,6 +45,13 @@ def show_demo_menu():
     print("   • Real-time updates")
     print("   • Interactive scenarios")
     print()
+    print("4. 🏥 Hospital to Clinic Transfer Example")
+    print("   • Real-world protocol demonstration")
+    print("   • HIPAA-compliant data transfer")
+    print("   • DICOM imaging study transfer")
+    print("   • AI analysis results sharing")
+    print("   • Complete audit trail")
+    print()
     print("0. Exit")
     print()
 
@@ -63,16 +70,16 @@ async def run_ai_demo():
 def run_classic_demo():
     """Run the classic demo."""
     demo_dir = Path(__file__).parent / "demo"
-    
+
     if not demo_dir.exists():
         print("❌ Demo directory not found!")
         print(f"Expected: {demo_dir}")
         return 1
-    
+
     print("📍 Running classic demo...")
-    
+
     try:
-        result = subprocess.run([sys.executable, 'run_demo.py'], 
+        result = subprocess.run([sys.executable, 'run_demo.py'],
                               cwd=demo_dir, check=True)
         return result.returncode
     except subprocess.CalledProcessError as e:
@@ -85,21 +92,21 @@ def run_classic_demo():
 def run_web_demo():
     """Run the web demo."""
     demo_html = Path(__file__).parent / "demo" / "demo.html"
-    
+
     if demo_html.exists():
         print("🌐 Opening web demo in your default browser...")
         print(f"   File: {demo_html}")
         print()
         print("If the browser doesn't open automatically, navigate to:")
         print(f"   file://{demo_html.absolute()}")
-        
+
         # Try to open in browser
         import webbrowser
         try:
             webbrowser.open(f"file://{demo_html.absolute()}")
             print("\n✅ Web demo opened successfully!")
             print("   Press Ctrl+C to return to the menu")
-            
+
             # Keep the script running
             try:
                 while True:
@@ -107,56 +114,87 @@ def run_web_demo():
                     time.sleep(1)
             except KeyboardInterrupt:
                 print("\n🔙 Returning to main menu...")
-                
+
         except Exception as e:
             print(f"❌ Could not open browser: {e}")
     else:
         print("❌ Web demo file not found!")
         print(f"   Expected location: {demo_html}")
 
+def run_hospital_clinic_example():
+    """Run the hospital to clinic transfer example."""
+    example_dir = Path(__file__).parent / "demo" / "examples"
+    example_file = example_dir / "hospital_to_clinic_transfer.py"
+
+    if not example_file.exists():
+        print("❌ Hospital to clinic example not found!")
+        print(f"   Expected: {example_file}")
+        return 1
+
+    print("🏥 Running hospital to clinic transfer example...")
+    print()
+
+    try:
+        result = subprocess.run([sys.executable, 'hospital_to_clinic_transfer.py'],
+                              cwd=example_dir, check=True)
+        return result.returncode
+    except subprocess.CalledProcessError as e:
+        print(f"❌ Example failed with exit code: {e.returncode}")
+        return e.returncode
+    except FileNotFoundError:
+        print("❌ Python executable not found!")
+        return 1
+
 async def main():
     """Main demo launcher."""
     print_banner()
-    
+
     while True:
         show_demo_menu()
-        
+
         try:
-            choice = input("Enter your choice (0-3): ").strip()
+            choice = input("Enter your choice (0-4): ").strip()
             print()
-            
+
             if choice == "1":
                 print("🚀 Launching AI/ML Demo...")
                 print("   Loading AI models and LangGraph workflows...")
                 print()
                 await run_ai_demo()
-                
+
             elif choice == "2":
                 print("🚀 Launching Classic Demo...")
                 print()
                 result = run_classic_demo()
                 if result != 0:
                     print("❌ Classic demo exited with error")
-                
+
             elif choice == "3":
                 print("🚀 Launching Web Demo...")
                 print()
                 run_web_demo()
-                
+
+            elif choice == "4":
+                print("🚀 Launching Hospital to Clinic Transfer Example...")
+                print()
+                result = run_hospital_clinic_example()
+                if result != 0:
+                    print("❌ Example exited with error")
+
             elif choice == "0":
                 print("👋 Thank you for trying ERAIF!")
                 print("   For more information, visit: https://eraif.org")
                 break
-                
+
             else:
-                print("❌ Invalid choice. Please select 0-3.")
-            
+                print("❌ Invalid choice. Please select 0-4.")
+
         except KeyboardInterrupt:
             print("\n\n⏸️  Demo interrupted by user.")
             break
         except Exception as e:
             print(f"❌ Error: {e}")
-        
+
         print("\n" + "─" * 60 + "\n")
 
 if __name__ == "__main__":
