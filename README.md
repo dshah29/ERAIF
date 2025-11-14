@@ -95,6 +95,7 @@ python launch_demo.py
 # 2. 📊 Classic Demo - Original system features
 # 3. 🎮 Web Demo - Browser-based interface
 # 4. 🏥 Hospital to Clinic Transfer - Real-world protocol example
+# 5. 🔗 FHIR R4 Emergency Transfer - HL7 FHIR integration example
 ```
 
 **AI Demo Features:**
@@ -138,6 +139,24 @@ python hospital_to_clinic_transfer.py
 - ✅ Data integrity verification
 - ✅ Comprehensive audit logging
 
+### 2. FHIR R4 Emergency Transfer
+
+**NEW! HL7 FHIR R4 Integration** - Standardized healthcare data exchange:
+
+```bash
+cd demo/examples
+python fhir_emergency_transfer.py
+```
+
+**What it demonstrates:**
+- ✅ ERAIF to FHIR R4 resource conversion
+- ✅ FHIR Patient, ImagingStudy, and DiagnosticReport resources
+- ✅ AI analysis integration with FHIR extensions
+- ✅ Emergency transfer workflow with priority handling
+- ✅ FHIR server communication (REST API)
+- ✅ FHIR Bundle transactions for atomic operations
+- ✅ Interoperability with existing EHR systems
+
 See [`demo/examples/README.md`](demo/examples/README.md) for more examples and documentation.
 
 ## 📊 Impact Metrics
@@ -171,7 +190,7 @@ Currently working with:
 - [x] Intelligent triage and decision support
 - [x] Emergency workflow orchestration
 - [x] Comprehensive monitoring and logging
-- [ ] FHIR integration complete
+- [x] **FHIR R4 integration complete** ✨ NEW!
 - [ ] Security audit
 
 ### Phase 2: Validation (Q4 2025)

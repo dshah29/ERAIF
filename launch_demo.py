@@ -52,6 +52,13 @@ def show_demo_menu():
     print("   • AI analysis results sharing")
     print("   • Complete audit trail")
     print()
+    print("5. 🔗 FHIR R4 Emergency Transfer Example")
+    print("   • HL7 FHIR R4 standard integration")
+    print("   • Interoperability with EHR systems")
+    print("   • Emergency radiology workflows")
+    print("   • AI analysis with FHIR extensions")
+    print("   • FHIR resource conversion")
+    print()
     print("0. Exit")
     print()
 
@@ -145,6 +152,30 @@ def run_hospital_clinic_example():
         print("❌ Python executable not found!")
         return 1
 
+async def run_fhir_example():
+    """Run the FHIR R4 emergency transfer example."""
+    example_dir = Path(__file__).parent / "demo" / "examples"
+    example_file = example_dir / "fhir_emergency_transfer.py"
+
+    if not example_file.exists():
+        print("❌ FHIR emergency transfer example not found!")
+        print(f"   Expected: {example_file}")
+        return 1
+
+    print("🔗 Running FHIR R4 emergency transfer example...")
+    print()
+
+    try:
+        result = subprocess.run([sys.executable, 'fhir_emergency_transfer.py'],
+                              cwd=example_dir, check=True)
+        return result.returncode
+    except subprocess.CalledProcessError as e:
+        print(f"❌ Example failed with exit code: {e.returncode}")
+        return e.returncode
+    except FileNotFoundError:
+        print("❌ Python executable not found!")
+        return 1
+
 async def main():
     """Main demo launcher."""
     print_banner()
@@ -153,7 +184,7 @@ async def main():
         show_demo_menu()
 
         try:
-            choice = input("Enter your choice (0-4): ").strip()
+            choice = input("Enter your choice (0-5): ").strip()
             print()
 
             if choice == "1":
@@ -181,13 +212,20 @@ async def main():
                 if result != 0:
                     print("❌ Example exited with error")
 
+            elif choice == "5":
+                print("🚀 Launching FHIR R4 Emergency Transfer Example...")
+                print()
+                result = await run_fhir_example()
+                if result != 0:
+                    print("❌ Example exited with error")
+
             elif choice == "0":
                 print("👋 Thank you for trying ERAIF!")
                 print("   For more information, visit: https://eraif.org")
                 break
 
             else:
-                print("❌ Invalid choice. Please select 0-4.")
+                print("❌ Invalid choice. Please select 0-5.")
 
         except KeyboardInterrupt:
             print("\n\n⏸️  Demo interrupted by user.")

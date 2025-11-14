@@ -17,7 +17,7 @@ This roadmap outlines the development phases for the Emergency Radiology AI Inte
 ### Key Deliverables
 - [x] Core protocol specification (ECP 1.0)
 - [x] Reference implementation
-- [ ] FHIR R4 integration complete
+- [x] FHIR R4 integration complete
 - [ ] Security audit (Phase 1)
 - [x] Basic monitoring and logging
 

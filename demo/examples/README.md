@@ -36,6 +36,46 @@ python hospital_to_clinic_transfer.py
 
 ---
 
+### 2. FHIR R4 Emergency Transfer (`fhir_emergency_transfer.py`)
+
+**Scenario**: Emergency radiology data exchange using HL7 FHIR R4 standard for interoperability with existing healthcare systems.
+
+**What it demonstrates**:
+- ✅ ERAIF to FHIR R4 resource conversion
+- ✅ FHIR Patient, ImagingStudy, and DiagnosticReport resources
+- ✅ AI analysis integration with FHIR extensions
+- ✅ Emergency transfer workflow with priority handling
+- ✅ FHIR server communication (REST API)
+- ✅ FHIR Bundle transactions for atomic operations
+- ✅ FHIR search capabilities for resource retrieval
+
+**Run the example**:
+```bash
+cd demo/examples
+python fhir_emergency_transfer.py
+```
+
+**Expected output**:
+- FHIR resource conversion demonstrations
+- Emergency transfer workflow simulation
+- FHIR search examples
+- Integration guidelines
+
+**Use cases**:
+- Rural hospital transferring to trauma center
+- Integration with existing EHR systems
+- Multi-facility emergency response coordination
+- Standardized data exchange with PACS/RIS systems
+- Compliance with national healthcare data standards
+
+**Prerequisites** (for live FHIR server connection):
+```bash
+# Optional: Run HAPI FHIR server for testing
+docker run -p 8080:8080 hapiproject/hapi:latest
+```
+
+---
+
 ## 🏗️ Example Structure
 
 Each example follows a consistent pattern:
